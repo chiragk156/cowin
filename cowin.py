@@ -228,6 +228,11 @@ if __name__ == "__main__":
                 print('Retrying...')
                 sleep(5)
                 continue
+                
+            try:
+                data['centers'] = sorted(data['centers'], key=lambda item: item['sessions'][0]['available_capacity'],reverse=True)
+            except Exception as e:
+                raise e
 
             print('..')
             print(f'Found {len(data["centers"])} centers on {date}')
