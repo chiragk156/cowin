@@ -1,0 +1,25 @@
+{
+  "description" : "Please update the details given below and keep them in the exact same format as given below.",
+  "requirement" : [
+    "User must be registered with the same name and mobile number on cowin",
+    "OS: Win",
+    "Python libs to install: requests, svglib==1.0.1, pysimplegui"
+  ],
+
+  
+  "name": "Chirag Khurana",
+  "mobile": "9896969696",
+  "dose": "1",
+  "pincodes": [
+    "124001","124201"
+  ],
+  "dates": [
+    "16-05-2021",
+    "17-05-2021",
+    "18-05-2021",
+    "19-05-2021"
+  ],
+  "desired_vaccines": [
+    "COVAXIN"
+  ]
+}
