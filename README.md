@@ -12,8 +12,7 @@ How to use:
 
 How will it work:
 1. It will beep when it finds any slot available.
-2. Will a
-sk you to provide OTP
+2. Will ask you to provide OTP
 3. Enter Captcha
 4. Done!
 
