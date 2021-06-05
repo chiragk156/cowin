@@ -34,7 +34,9 @@ time_to_wait = 5 # in seconds
 beep_freq = 2000
 
 headers = {'accept': 'application/json,','Accept-Language': 'hi_IN','User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-post_headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+post_headers = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+'content-type': 'application/json','content-value': '121','origin':'https://selfregistration.cowin.gov.in','referer':'https://selfregistration.cowin.gov.in', 'accept' : 'application/json, text/plain, */*', 'accept-encoding': 'gzip, deflate, br', 'accept-language':'en-GB,en-US;q=0.9,en;q=0.8',
+}
 base_url = 'https://cdn-api.co-vin.in/api'
 demo_url = 'https://api.demo.co-vin.in/api'
 slot_check_url = base_url + '/v2/appointment/sessions/public/calendarByPin'
@@ -45,6 +47,7 @@ booking_url = base_url + '/v2/appointment/schedule'
 capt_url = base_url + '/v2/auth/getRecaptcha'
 
 token = None
+captcha = None
 
 def beep(t):
     winsound.Beep(beep_freq, t*1000)
@@ -120,19 +123,21 @@ def generate_token():
 
 def get_benf_id(token):
     try:
+        benf = []
         get_headers = copy.deepcopy(headers)
         get_headers["Authorization"] = f"Bearer {token}"
         r = requests.get(url=benf_url,headers=get_headers)
         beneficiaries = r.json()['beneficiaries']
         for beneficiary in beneficiaries:
             print('Found beneficiary with name:', beneficiary['name'])
-            if beneficiary['name'].lower() == name.lower():
-              return beneficiary[ 'beneficiary_reference_id' ]
+            if beneficiary['name'].lower() in name.lower():
+              benf.append( beneficiary[ 'beneficiary_reference_id' ])
+        if len(benf)==0:
+            print('Unable to find benf_id for name:', name)
+            exit()
+        return benf
     except Exception:
         print('Unable to get benf_id')
-        return get_benf_id(token)
-    print('Unable to get benf_id for name:', name)
-    exit()
 
 def captcha_builder(resp):
     with open('captcha.svg', 'w') as f:
@@ -165,7 +170,9 @@ def generate_captcha(token):
 
 def book_slot(token, center_id, session_id, slot, benf):
     try:
-        captcha = generate_captcha(token)
+        global captcha
+        if not captcha:
+            captcha = generate_captcha(token)
         data = {'center_id':center_id, 'session_id':session_id,'slot':slot,'dose':dose,'beneficiaries':[benf]}
         data['captcha'] = captcha
         p_headers = copy.deepcopy(post_headers)
@@ -180,6 +187,7 @@ def book_slot(token, center_id, session_id, slot, benf):
             return
         else:
             print('Unable to book, status_code:', r.status_code, r.json()['error'])
+            captcha = None
 
     except Exception as e:
         print('Unable to book')
@@ -228,7 +236,7 @@ if __name__ == "__main__":
                 print('Retrying...')
                 sleep(5)
                 continue
-                
+
             try:
                 data['centers'] = sorted(data['centers'], key=lambda item: item['sessions'][0]['available_capacity'],reverse=True)
             except Exception as e:
