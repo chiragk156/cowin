@@ -1,13 +1,14 @@
 {
   "description" : "Please update the details given below and keep them in the exact same format as given below.",
   "requirement" : [
-    "User must be registered with the same name and mobile number on cowin",
+    "Beneficiary must be registered with the same name and mobile number on cowin",
+    "Multiple beneficiaries can book in single shot. Enter comma separated exact names as given below"
     "OS: Win",
     "Python libs to install: requests, svglib==1.0.1, pysimplegui"
   ],
 
   
-  "name": "Chirag Khurana",
+  "name": "Chirag Khurana, Rahul Arora",
   "mobile": "9896969696",
   "dose": "1",
   "pincodes": [
@@ -20,6 +21,6 @@
     "19-05-2021"
   ],
   "desired_vaccines": [
-    "COVAXIN"
+    "COVAXIN","COVISHIELD"
   ]
 }
