@@ -127,15 +127,21 @@ def get_benf_id(token):
         get_headers = copy.deepcopy(headers)
         get_headers["Authorization"] = f"Bearer {token}"
         r = requests.get(url=benf_url,headers=get_headers)
-        beneficiaries = r.json()['beneficiaries']
-        for beneficiary in beneficiaries:
-            print('Found beneficiary with name:', beneficiary['name'])
-            if beneficiary['name'].lower() in name.lower():
-              benf.append( beneficiary[ 'beneficiary_reference_id' ])
-        if len(benf)==0:
-            print('Unable to find benf_id for name:', name)
-            exit()
-        return benf
+        if r.status_code == 200:
+            beneficiaries = r.json()['beneficiaries']
+            for beneficiary in beneficiaries:
+                print('Found beneficiary with name:', beneficiary['name'])
+                if beneficiary['name'].lower() in name.lower():
+                  benf.append( beneficiary[ 'beneficiary_reference_id' ])
+            if len(benf)==0:
+                print('Unable to find benf_id for name:', name)
+                exit()
+            return benf
+        elif r.status_code == 401:
+            print("Unable to fetch beneficiaries, unauthorized access")
+            return 401
+        else:
+            return get_benf_id(token)
     except Exception:
         print('Unable to get benf_id')
 
@@ -259,13 +265,16 @@ if __name__ == "__main__":
                     print(msg)
                     beep(2)
                     print('Trying to book it')
-                    if len(sys.argv)>2:
+                    if (token == None) and len(sys.argv)>2:
                         token = sys.argv[2]
                     elif token:
                         pass
                     else:
                         token = generate_token()
                     benf_id = get_benf_id(token)
+                    if benf_id == 401:
+                        token = generate_token()
+                        benf_id = get_benf_id(token)
                     center_id = center['center_id']
                     session_id = center['sessions'][0]['session_id']
                     slot = center['sessions'][0]['slots'][0]
