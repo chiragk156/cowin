@@ -1,4 +1,4 @@
-# [Depreciated] Cowin Bot
+# [Obsolete] Cowin Bot
 To find vaccine availability and to book slots
 
 Requirements:
